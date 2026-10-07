@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mixed Review Arena</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap">
+<style>
+:root{--bg:#46178f;--bg2:#6a2fd0;--card:#fff;--ink:#241a3a;--mut:#d9ccff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1f0a45;--bg2:#3a1a80;--card:#2a1f4d;--ink:#f4efff;--mut:#bfb2ee}}
+:root[data-theme="dark"]{--bg:#1f0a45;--bg2:#3a1a80;--card:#2a1f4d;--ink:#f4efff;--mut:#bfb2ee}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}
+body{font-family:'Baloo 2',system-ui,'Segoe UI',sans-serif;color:#fff;background:linear-gradient(160deg,var(--bg),var(--bg2)) fixed;padding:12px}
+#app{max-width:1000px;margin:0 auto}
+h1{font-size:clamp(30px,7vw,54px);text-align:center;margin:.3em 0 0;font-weight:800}
+h3{margin:.8em 0 .3em;font-size:clamp(18px,3.6vw,24px)}
+p{font-size:clamp(15px,3vw,20px);margin:.3em 0}.sub{text-align:center;color:var(--mut)}
+.decks{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.dk{background:var(--card);color:var(--ink);border:4px solid transparent;border-radius:16px;padding:12px;font:inherit;font-size:clamp(16px,3vw,20px);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
+.dk small{color:#6b6385;font-size:14px}.dk.on{border-color:#ffd23f;transform:scale(1.03)}
+.panel{background:var(--card);color:var(--ink);border-radius:16px;padding:12px 16px;margin-top:10px}
+.panel label{font-weight:700}input,select,textarea{font:inherit;font-size:16px;border-radius:10px;border:3px solid #b9a7f0;padding:6px 10px;background:#fff;color:#241a3a}
+textarea{width:100%}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:8px}
+.go{font-family:inherit;font-weight:800;font-size:clamp(17px,3.4vw,22px);border:0;border-radius:14px;padding:12px 24px;cursor:pointer;color:#fff;background:#26890c;box-shadow:0 5px 0 #0004;margin:8px 6px 0 0}
+.go.alt{background:#1368ce}.go.gr{background:#6b6385}
+.top{display:flex;justify-content:space-between;gap:8px;background:#0003;border-radius:12px;padding:8px 14px;font-weight:700;font-size:clamp(14px,3vw,20px)}
+.tn{background:#fff;color:#46178f;border-radius:50%;min-width:2.2em;text-align:center}
+.tbar{height:14px;background:#0004;border-radius:9px;margin:8px 0;overflow:hidden}.tbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ffd23f,#ff5f9e)}
+.tag{display:inline-block;background:#0004;border-radius:999px;padding:2px 14px;font-size:clamp(13px,2.6vw,17px);margin-top:6px}
+.qbox{background:var(--card);color:var(--ink);border-radius:16px;padding:18px;text-align:center;font-weight:700;font-size:clamp(20px,4.4vw,34px);margin:8px 0;min-height:3.2em;display:grid;place-items:center}
+.ans{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.a{background:var(--c);color:#fff;border:0;border-radius:14px;padding:16px 12px;font:inherit;font-weight:700;font-size:clamp(16px,3.4vw,26px);text-align:left;cursor:pointer;box-shadow:0 5px 0 #0004;display:flex;gap:10px;align-items:center;min-height:4em}
+.a:nth-child(3){color:#241a3a}.a b{font-size:1.2em}.a:disabled{cursor:default}.a.dim{opacity:.3}.a.ok{outline:5px solid #fff;transform:scale(1.02)}
+div.a{cursor:default}
+.fb{background:var(--card);color:var(--ink);border-radius:14px;padding:10px 14px;margin-top:10px;font-size:clamp(16px,3.2vw,22px)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chip{font:inherit;font-weight:700;font-size:clamp(16px,3vw,22px);padding:10px 16px;border-radius:999px;border:4px solid #fff4;background:#0003;color:#fff;cursor:pointer}.chip.on{background:#26890c;border-color:#ffd23f}
+.row{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:clamp(16px,3.2vw,22px)}
+.row .nm{min-width:7.5em;font-weight:700}.row .br{flex:1;background:#0004;border-radius:9px;height:26px;overflow:hidden}.row .br i{display:block;height:100%;background:linear-gradient(90deg,#ffd23f,#ff5f9e);transition:width .6s}
+.row .sc{min-width:4.5em;text-align:right;font-weight:800}
+.pod{font-size:clamp(20px,4.6vw,32px)}
+.cf{position:fixed;top:-30px;font-size:26px;animation:fall 2.2s linear forwards;pointer-events:none;z-index:9}@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+</style></head><body><div id="app"></div>
+<script>
+const $=id=>document.getElementById(id),R=n=>Math.floor(Math.random()*n),sh=a=>a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+const COL=['#e21b3c','#1368ce','#d89e00','#26890c'],SHP=['▲','◆','●','■'];
+const DECKS={
+fig:{n:'Figurative Language',s:'ELA.6.R.3.1',e:'🎭',q:[
+['“The snow was like a soft blanket.” What is this?',['Simile','Metaphor','Personification','Hyperbole'],0],
+['“Time is a thief.” What is this?',['Hyperbole','Metaphor','Simile','Idiom'],1],
+['“The wind whispered through the trees.”',['Simile','Hyperbole','Personification','Alliteration'],2],
+['“I’m so hungry I could eat a horse.”',['Metaphor','Idiom','Simile','Hyperbole'],3],
+['“Bold bees buzzed by the blue balloons.”',['Alliteration','Onomatopoeia','Idiom','Simile'],0],
+['“The bacon sizzled and popped.” “Sizzled” is…',['Personification','Onomatopoeia','Hyperbole','Metaphor'],1],
+['“It’s raining cats and dogs.”',['Idiom','Simile','Metaphor','Alliteration'],0],
+['What does the idiom “break the ice” mean?',['Smash frozen water','Start a friendly conversation','Feel cold','End an argument'],1],
+['“Her voice was as smooth as butter.” What does this simile suggest?',['Her voice is greasy','Her voice sounds soft and pleasant','She is loud','She is hungry'],1],
+['“The classroom was a zoo.” What tone does this metaphor create?',['Calm and quiet','Wild and chaotic','Sad','Formal'],1]]},
+form:{n:'Poetic Forms',s:'ELA.6.R.1.4',e:'📜',q:[
+['A two-line stanza is a…',['Tercet','Quatrain','Couplet','Sonnet'],2],
+['A stanza with four lines is a…',['Quatrain','Couplet','Tercet','Refrain'],0],
+['Rhyme scheme of: gray / in / away / skin',['AABB','ABAB','ABBA','ABCD'],1],
+['A sentence that runs over the line break without stopping is…',['End stop','Enjambment','Refrain','Couplet'],1],
+['A line that ends with a complete thought and a period is…',['End-stopped','Enjambed','A tercet','A volta'],0],
+['How many lines does a sonnet have?',['10','12','14','19'],2],
+['A villanelle has 19 lines and two…',['Couplets','Refrains','Voltas','Haikus'],1],
+['The “turn” in a sonnet is called the…',['Volta','Refrain','Stanza','Meter'],0],
+['A poem with no set rhyme or pattern is…',['Villanelle','Sonnet','Free verse','Limerick'],2],
+['Which form best fits a worry that keeps coming back?',['Sonnet','Villanelle','Free verse','Couplet'],1]]},
+pov:{n:'Point of View',s:'ELA.6.R.1.3',e:'👀',q:[
+['“I trudged through the snow, my boots heavy.” Point of view?',['First person','Second person','Third person'],0],
+['“Marcus walked to the bus stop. He shivered.” Point of view?',['First person','Second person','Third person'],2],
+['“You open the door, and the wind rushes in.”',['First person','Second person','Third person'],1],
+['Which pronouns signal first person?',['I, me, my, we','he, she, they','you, your','it, its'],0],
+['Which line is third person?',['We waved goodbye.','She waved goodbye.','You waved goodbye.','I waved goodbye.'],1],
+['Two narrators each say “I.” What is the effect?',['It shows one event from two views','It makes the poem second person','It removes the narrator','It adds rhyme'],0],
+['A poem shifts from “She” to “I” in the last line. What does this often do?',['Moves readers closer to the character’s thoughts','Changes the setting','Adds a refrain','Creates a rhyme scheme'],0],
+['Rewrite in first person: “She picked up her bag.”',['I picked up my bag.','You picked up your bag.','They picked up their bag.','He picked up his bag.'],0],
+['Why might a poet use first person?',['To let readers feel the narrator’s thoughts up close','To avoid pronouns','To describe only from outside','To speak to “you”'],0],
+['“I told everyone I was fine, but my stomach twisted.” What does the narrator reveal?',['A secret feeling only the narrator knows','The weather','Others’ thoughts','The setting'],0]]},
+ci:{n:'Central Idea',s:'ELA.6.R.2.2',e:'💡',q:[
+['What is the topic of a text?',['What the text is mostly about, in a few words','The big point as a full sentence','The first sentence','The title only'],0],
+['“Bees clean the hive, guard the door, and share flower locations by dancing. Without teamwork, the hive cannot survive.” Best central idea?',['Bees dance.','Honeybees survive by working as a team.','Bees are the best insects.','Honey is sweet.'],1],
+['A “central idea” that is only one detail from the text is…',['Too small','Just right','Too big','A refrain'],0],
+['Which is an opinion, not a central idea?',['Bees are the coolest animals ever.','Bees work together to survive.','Scouts share where flowers are.','Each bee has a job.'],0],
+['What are the 3 steps to find a central idea?',['Topic, key details, combine','Title, author, date','Rhyme, rhythm, repeat','Read, skip, guess'],0],
+['“School gardens give students science lessons, calm time outside, and fresh vegetables for the cafeteria.” Central idea?',['School gardens help students and the school in many ways.','Students water plants.','Everyone should eat vegetables.','Science is hard.'],0]]},
+spk:{n:'Multiple Speakers',s:'ELA.6.R.1.3',e:'🗣️',q:[
+['How can poets show a new speaker?',['Name labels, quotation marks, indents, or italics','Making lines longer','Adding a title','Using only rhyme'],0],
+['“Time to wake up!” “Five more minutes, please.” Who says the second line?',['The sleepy child','The parent','The alarm clock','The narrator'],0],
+['One speaker says snow means sledding; another says snow means shoveling. This shows two…',['Perspectives','Rhymes','Refrains','Couplets'],0],
+['“My stomach is doing flips.” What is the speaker’s tone?',['Nervous','Angry','Bored','Proud'],0],
+['A poem ends with a line both voices say together. What does it often show?',['The two voices share an idea or feeling','The poem changed topics','A mistake','A rhyme scheme'],0],
+['LIFEGUARD: “Everyone out of the water!” What is the lifeguard’s tone?',['Urgent and serious','Silly','Bored','Sleepy'],0]]}};
+let nm='',G={},tm,left,total;
+const app=h=>{$('app').innerHTML=h;scrollTo(0,0)};
+function boom(){const m=['🎉','⭐','✨','🎈','💥'];for(let k=0;k<24;k++){const s=document.createElement('span');s.className='cf';s.textContent=m[k%5];s.style.left=Math.random()*100+'vw';s.style.animationDelay=Math.random()*.5+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),2800)}}
+function timer(sec,end){left=total=sec;clearInterval(tm);const u=()=>{const b=$('tb');if(b)b.style.width=Math.max(0,left/total*100)+'%';const t=$('tn');if(t)t.textContent=Math.ceil(Math.max(0,left))};u();tm=setInterval(()=>{left-=.1;u();if(left<=0){clearInterval(tm);end()}},100)}
+const ROUND=20;
+function build(){const all=[];Object.values(DECKS).forEach(d=>d.q.forEach(([q,o,a])=>all.push({q,o,a,t:d.e+' '+d.n})));return sh(all).slice(0,ROUND).map(x=>{const ix=sh(x.o.map((_,i)=>i));return{q:x.q,o:ix.map(i=>x.o[i]),a:ix.indexOf(x.a),t:x.t}})}
+function home(){clearInterval(tm);
+ app(`<h1>🎮 Mixed Review Arena</h1><p class="sub">Solo Mode • ${ROUND} random questions from everything we have learned</p>
+ <div class="panel"><h3 style="margin-top:0">What’s in the mix</h3><p>${Object.values(DECKS).map(d=>`${d.e} ${d.n} <small>(${d.s})</small>`).join('<br>')}</p></div>
+ <div class="panel"><p>Beat the clock, earn coins, open mystery chests, and race 3 bots. Every round is a new mix!</p><label>Name: <input id="nm" value="${nm}" placeholder="Your name" size="14"></label><br><button class="go" onclick="solo()">Start ▶</button></div>`)}
+function chest(me,all){const o=all.filter(x=>x!==me),rich=o.sort((a,b)=>b.c-a.c)[0],r=Math.random();
+ if(r<.3){me.c+=100;return '<br>🎁 Chest: +100 bonus coins!'}
+ if(r<.5){me.c+=250;return '<br>💎 Jackpot chest: +250 coins!'}
+ if(r<.75&&rich&&rich.c>0){const s=Math.min(100,rich.c);rich.c-=s;me.c+=s;return `<br>🕵️ Chest: stole ${s} coins from ${rich.name}!`}
+ if(r<.9){const g=Math.min(300,Math.round(me.c*.25));me.c+=g;return `<br>🚀 Chest: coin boost +${g}!`}
+ const l=Math.min(50,me.c);me.c-=l;return `<br>💥 Trap chest: lost ${l} coins!`}
+const qHTML=(it,click)=>`<div class="tag">${it.t}</div><div class="qbox">${it.q}</div><div class="ans">${it.o.map((o,k)=>`<button class="a" style="--c:${COL[k]}" data-k="${k}"><b>${SHP[k]}</b> ${o}</button>`).join('')}</div>`;
+/* SOLO */
+function solo(){nm=($('nm')?$('nm').value:nm).trim()||'You';const me={name:nm+' 🙂',c:0};G={mode:'solo',qs:build(),i:0,st:0,ok:0,me,bots:[{name:'Pixel 🤖',c:0},{name:'Nova 🚀',c:0},{name:'Blaze 🔥',c:0}]};G.all=[me,...G.bots];sQ()}
+function sQ(){const it=G.qs[G.i];app(`<div class="top"><span>${G.me.name}: 🪙 ${G.me.c}</span><span>Q ${G.i+1}/${G.qs.length}</span><span>🔥 ${G.st}</span><span id="tn" class="tn"></span></div><div class="tbar"><i id="tb"></i></div>${qHTML(it,1)}<div id="fb"></div>`);
+ document.querySelectorAll('.a').forEach(b=>b.onclick=()=>sA(+b.dataset.k));timer(20,()=>sA(-1))}
+function sA(k){clearInterval(tm);const it=G.qs[G.i],last=G.i==G.qs.length-1;let m;
+ document.querySelectorAll('.a').forEach((b,j)=>{b.disabled=true;b.classList.add(j==it.a?'ok':'dim')});
+ if(k==it.a){const p=100+Math.round(Math.max(0,left)/20*100)+Math.min(G.st,5)*20;G.st++;G.ok++;G.me.c+=p;m=`✅ Correct! +${p} coins`+chest(G.me,G.all);boom()}
+ else{G.st=0;m=(k<0?'⏰ Time’s up!':'❌ Not quite.')+` Answer: <b>${it.o[it.a]}</b>`}
+ G.bots.forEach(b=>{if(Math.random()<.6)b.c+=100+R(80)});
+ const rk=[...G.all].sort((a,b)=>b.c-a.c).indexOf(G.me)+1;
+ $('fb').innerHTML=`<div class="fb">${m}<br>🪙 ${G.me.c} coins • Rank #${rk} of 4</div><button class="go" id="nx">${last?'See results →':'Next →'}</button>`;
+ $('nx').onclick=()=>{if(last)end();else{G.i++;sQ()}}}
+/* RESULTS */
+function end(){boom();const s=[...G.all].sort((a,b)=>b.c-a.c),M=['🥇','🥈','🥉'],mx=Math.max(1,s[0].c);
+ app(`<h1>🏆 Final Results</h1><p class="sub">You got ${G.ok} of ${G.qs.length} correct • You vs. the bots</p><div class="panel pod" style="color:#fff;background:#0003">${s.map((t,i)=>`<div class="row"><span class="nm">${M[i]||(i+1)+'.'} ${t.name}</span><span class="br"><i style="width:${t.c/mx*100}%"></i></span><span class="sc">${t.c}</span></div>`).join('')}</div><button class="go" onclick="solo()">Play again (new mix) ↻</button><button class="go gr" onclick="home()">Home</button>`)}
+home();
+</script></body></html>
